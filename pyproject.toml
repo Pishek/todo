@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "todo"
+version = "0.1.0"
+description = ""
+authors = ["p.afanasev <p.afanasev@x5.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.6"
+djangorestframework = "^3.15.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
