@@ -1,0 +1,18 @@
+.idea
+.vscode
+.venv
+venv
+.env
+
+# byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+log
+docker-compose.override.yml
+shared/
+
+.coverage
+.python-version
+coverage.xml
