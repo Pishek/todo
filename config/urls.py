@@ -19,8 +19,9 @@ from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from apps.todo.views.user import CustomTokenCreateView, CustomTokenDestroyView, CustomUserViewSet
+
 urlpatterns = [
-    path("todo/", include("apps.todo.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/docs/",
@@ -28,4 +29,8 @@ urlpatterns = [
         name="swagger-ui",
     ),
     path("admin/", admin.site.urls),
+    path("todo/", include("apps.todo.urls")),
+    path("auth/register/", CustomUserViewSet.as_view({"post": "create"}), name="register"),
+    path("auth/login/", CustomTokenCreateView.as_view(), name="login"),
+    path("auth/logout/", CustomTokenDestroyView.as_view(), name="logout"),
 ]

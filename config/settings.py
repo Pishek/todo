@@ -40,10 +40,11 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
+    "djoser",
     "apps.todo.apps.TodoConfig",
     "drf_spectacular",
 ]
@@ -135,12 +136,14 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.TokenAuthentication",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+DJOSER = {"SEND_ACTIVATION_EMAIL": False}
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Your API Title",

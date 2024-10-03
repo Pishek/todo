@@ -16,6 +16,4 @@ flake8:
 mypy:
 	mypy --namespace-packages --explicit-package-bases .
 
-
-
 lint: flake8 mypy
