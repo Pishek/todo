@@ -19,12 +19,8 @@ class PriorityEnum(StrEnum):
 class TaskOrm(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    status = models.CharField(
-        choices=[(x, x) for x in StatusEnum], default=StatusEnum.PENDING
-    )
-    priority = models.CharField(
-        choices=[(x, x) for x in PriorityEnum], default=PriorityEnum.LOW
-    )
+    status = models.CharField(choices=[(x, x) for x in StatusEnum], default=StatusEnum.PENDING)
+    priority = models.CharField(choices=[(x, x) for x in PriorityEnum], default=PriorityEnum.LOW)
     due_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
