@@ -16,4 +16,7 @@ flake8:
 mypy:
 	mypy --namespace-packages --explicit-package-bases .
 
+start:
+	docker compose up --build
+
 lint: flake8 mypy
