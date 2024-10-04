@@ -1,7 +1,19 @@
 from django.urls import path
 
-from .views.task import TasksGetView
+from .views.task import TaskViewSet
 
 urlpatterns = [
-    path("tasks/", TasksGetView.as_view(), name="tasks-list"),
+    path("tasks/", TaskViewSet.as_view({"get": "list", "post": "create"}), name="task-list"),
+    path(
+        "tasks/<int:pk>/",
+        TaskViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+        name="task-detail",
+    ),
 ]
