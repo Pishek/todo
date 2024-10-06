@@ -22,9 +22,9 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from apps.todo.views.user import CustomTokenCreateView, CustomTokenDestroyView, CustomUserViewSet
 
 urlpatterns = [
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "api/docs/",
+        "docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
