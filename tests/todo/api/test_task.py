@@ -121,3 +121,16 @@ def test_delete_task_ok(api_client: APIClient, user_token: Token, user_tasks: li
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert task_1 is None
+
+
+@pytest.mark.django_db
+def test_comlited_task_ok(api_client: APIClient, user_token: Token, user_tasks: list[TaskOrm]) -> None:
+
+    api_client.credentials(HTTP_AUTHORIZATION="Bearer " + user_token.key)
+    response = api_client.post(f"/todo/task/{user_tasks[0].pk}/complete/", format="json")
+
+    task_1 = TaskOrm.objects.filter(pk=user_tasks[0].pk).first()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert task_1.status == StatusEnum.COMPLETED
+    assert task_1.completed_at is not None
