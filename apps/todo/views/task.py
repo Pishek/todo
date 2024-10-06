@@ -11,13 +11,18 @@ from rest_framework.serializers import Serializer
 
 from apps.todo.exceptions import UserTasksNotFoundException
 from apps.todo.models import TaskOrm
-from apps.todo.serializers.task import TaskSerializer
+from apps.todo.serializers.task import TaskCreateSerializer, TaskListRetrieveSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = TaskOrm.objects.all()
-    serializer_class = TaskSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_serializer_class(self) -> Serializer:
+        if self.action == "create":
+            return TaskCreateSerializer
+        if self.action in ("retrieve", "list", "update", "partial_update"):
+            return TaskListRetrieveSerializer
 
     def get_queryset(self) -> QuerySet:
         user_id = self.request.user.id

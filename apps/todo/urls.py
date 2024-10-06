@@ -3,9 +3,10 @@ from django.urls import path
 from .views.task import TaskViewSet
 
 urlpatterns = [
-    path("tasks/", TaskViewSet.as_view({"get": "list", "post": "create"}), name="task-list"),
+    path("tasks/", TaskViewSet.as_view({"get": "list"}), name="task-list"),
+    path("task/", TaskViewSet.as_view({"post": "create"}), name="task-create"),
     path(
-        "tasks/<int:pk>/",
+        "task/<int:pk>/",
         TaskViewSet.as_view(
             {
                 "get": "retrieve",

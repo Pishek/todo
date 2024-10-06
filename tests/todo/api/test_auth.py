@@ -12,18 +12,23 @@ from tests.utils import fake
 @pytest.mark.django_db
 def test_registration_ok(api_client: APIClient) -> None:
     payload = {"username": fake.person.name(), "password": fake.person.password(), "email": fake.person.email()}
+    expected_data = {"username": payload["username"], "email": payload["email"], "id": ANY}
 
     response = api_client.post("/auth/register/", data=payload, format="json")
+
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.data == {"username": payload["username"], "email": payload["email"], "id": ANY}
+    assert response.data == expected_data
 
 
 @pytest.mark.django_db
 def test_login_ok(api_client: APIClient, user: User, user_password: str) -> None:
     payload = {"username": user.username, "password": user_password}
+    expected_data = {"auth_token": ANY}
+
     response = api_client.post("/auth/login/", data=payload, format="json")
+
     assert response.status_code == status.HTTP_200_OK
-    assert response.data == {"auth_token": ANY}
+    assert response.data == expected_data
 
 
 @pytest.mark.django_db
