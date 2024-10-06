@@ -19,6 +19,9 @@ black = "^24.8.0"
 flake8 = "^7.1.1"
 isort = "^5.13.2"
 mypy = "^1.11.2"
+pytest = "^8.3.3"
+mimesis = "^18.0.0"
+pytest-django = "^4.9.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -29,3 +32,6 @@ build-backend = "poetry.core.masonry.api"
 line-length = 120
 target-version = ['py311']
 skip-string-normalization = false
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
