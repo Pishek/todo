@@ -19,4 +19,7 @@ mypy:
 start:
 	docker compose up --build
 
+test:
+	pytest . -vv
+
 lint: flake8 mypy
