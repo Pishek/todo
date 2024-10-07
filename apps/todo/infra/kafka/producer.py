@@ -1,14 +1,10 @@
 from confluent_kafka import Producer
 
-config = {
-    'bootstrap.servers': 'kafka:9092',
-    'group.id': 'mygroup',
-    'auto.offset.reset': 'earliest'
-}
+from config.todo.settings import KAFKA_CONFIG
+
+producer = Producer(KAFKA_CONFIG)
 
 
-producer = Producer(config)
-
-def send_message(topic, message):
+def send_message(topic, message):  # type: ignore
     producer.produce(topic, value=message)
     producer.flush()

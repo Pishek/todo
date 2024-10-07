@@ -151,3 +151,9 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+KAFKA_CONFIG = {
+    "bootstrap.servers": f"{os.getenv('KAFKA_HOST')}:{os.getenv('KAFKA_PORT')}",
+    "group.id": "mygroup",
+    "auto.offset.reset": "earliest",
+}
