@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.todo.infra.kafka.producer import send_message
+
 
 class CustomUserViewSet(UserViewSet):
     """Регистрация пользователя"""
@@ -20,6 +22,7 @@ class CustomTokenCreateView(TokenCreateView):
 
     @extend_schema(methods=["post"], tags=["User auth"])
     def post(self, request: Request, **kwargs: Any) -> Response:
+        send_message('my-topic', 'Hello Kafka World!')
         return super().post(request, **kwargs)
 
 
