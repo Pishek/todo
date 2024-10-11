@@ -1,7 +1,7 @@
 import json
 import logging
 from dataclasses import asdict
-from typing import Any
+from typing import Union
 
 from confluent_kafka import Producer
 from confluent_kafka.cimpl import KafkaException, Message
@@ -18,10 +18,9 @@ class KafkaProducer:
         self._producer = Producer(KAFKA_CONFIG)
 
     def send_completed_task(self, message: CompletedTaskDTO) -> None:
-        valid_message = self._serialize_message(asdict(message))
-        self._send_message(topic=TopicKafkaEnum.COMPLETED_TASKS, message=valid_message)
+        self._send_message(topic=TopicKafkaEnum.COMPLETED_TASKS, message=self._serialize_message(asdict(message)))
 
-    def _serialize_message(self, data: dict[str, Any]) -> str:
+    def _serialize_message(self, data: dict[str, Union[str, int]]) -> str:
         return json.dumps(data)
 
     def _send_message(self, topic: str, message: str) -> None:

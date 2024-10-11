@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any
 
 from django.db.models import QuerySet
@@ -12,8 +11,9 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from apps.todo.exceptions import UserTasksNotFoundException
-from apps.todo.models import StatusEnum, TaskOrm
+from apps.todo.models import TaskOrm
 from apps.todo.serializers.task import TaskCompleteSerializer, TaskCreateSerializer, TaskListRetrieveSerializer
+from apps.todo.services.complete_service import CompleteTaskService
 
 
 class TaskCreateViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -83,11 +83,9 @@ class TaskCompleteViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     @extend_schema(methods=["post"], tags=["Tasks"])
     @action(detail=True, methods=["post"])
     def complete_task(self, request: Request, pk: int | None = None) -> Response:
-        task = self.get_object()
-        if task:
-            task.status = StatusEnum.COMPLETED
-            task.completed_at = datetime.now()
-            task.save()
+        if task := self.get_object():
+            _service = CompleteTaskService(task=task)
+            task = _service.process()
             serializer = self.serializer_class(task)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         else:

@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 
 @dataclass
 class CompletedTaskDTO:
     user_id: int
+    task_id: int
     title: str
     priority: str
-    created_at: datetime
-    completed_at: datetime
+    status: str
+    created_at: str
+    completed_at: str
+    duration_in_days: int
