@@ -59,7 +59,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "config.urls"
+ROOT_URLCONF = "config.todo.urls"
 
 TEMPLATES = [
     {
@@ -77,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = "config.todo.wsgi.application"
 
 
 # Database
@@ -150,4 +150,33 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Your API description",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"simple": {"format": "%(asctime)s: %(message)s", "datefmt": "%H:%M:%S"}},
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "custom_logger": {  # Кастомный логгер
+            "handlers": [
+                "console",
+            ],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
+
+
+KAFKA_CONFIG = {
+    "bootstrap.servers": f"{os.getenv('KAFKA_HOST')}:{os.getenv('KAFKA_PORT')}",
+    "group.id": "mygroup",
+    "auto.offset.reset": "earliest",
 }

@@ -12,6 +12,9 @@ python-dotenv = "^1.0.1"
 psycopg2 = "^2.9.9"
 drf-spectacular = "^0.27.2"
 djoser = "^2.2.3"
+confluent-kafka = "^2.5.3"
+pydantic = "^2.9.2"
+pydantic-settings = "^2.5.2"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -22,6 +25,7 @@ mypy = "^1.11.2"
 pytest = "^8.3.3"
 mimesis = "^18.0.0"
 pytest-django = "^4.9.0"
+pytest-mock = "^3.14.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -34,4 +38,4 @@ target-version = ['py311']
 skip-string-normalization = false
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings"
+DJANGO_SETTINGS_MODULE = "config.todo.settings"

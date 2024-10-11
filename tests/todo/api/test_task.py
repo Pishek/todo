@@ -1,11 +1,13 @@
 from unittest.mock import ANY
 
 import pytest
+from pytest_mock import MockerFixture
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from apps.todo.models import PriorityEnum, StatusEnum, TaskOrm
+from apps.todo.services.complete_service import CompleteTaskService
 from tests.utils import fake
 
 
@@ -17,7 +19,12 @@ def test_create_task_ok(api_client: APIClient, user_token: Token) -> None:
         "status": StatusEnum.PENDING,
         "priority": PriorityEnum.LOW,
     }
-    expected_data = {"id": ANY, "title": payload["title"]}
+    expected_data = {
+        "id": ANY,
+        "title": payload["title"],
+        "description": payload["description"],
+        "priority": payload["priority"],
+    }
 
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + user_token.key)
     response = api_client.post("/todo/task/", data=payload, format="json")
@@ -34,7 +41,7 @@ def test_retrieve_task_ok(api_client: APIClient, user_token: Token, user_tasks: 
         "description": user_tasks[0].description,
         "status": user_tasks[0].status,
         "priority": user_tasks[0].priority,
-        "due_date": user_tasks[0].due_date,
+        "duration_in_days": user_tasks[0].duration_in_days,
         "created_at": ANY,
         "completed_at": user_tasks[0].completed_at,
     }
@@ -55,7 +62,7 @@ def test_get_list_tasks_ok(api_client: APIClient, user_token: Token, user_tasks:
             "description": x.description,
             "status": x.status,
             "priority": x.priority,
-            "due_date": x.due_date,
+            "duration_in_days": x.duration_in_days,
             "created_at": ANY,
             "completed_at": x.completed_at,
         }
@@ -77,7 +84,7 @@ def test_patch_task_ok(api_client: APIClient, user_token: Token, user_tasks: lis
         "description": user_tasks[0].description,
         "status": user_tasks[0].status,
         "priority": user_tasks[0].priority,
-        "due_date": user_tasks[0].due_date,
+        "duration_in_days": user_tasks[0].duration_in_days,
         "created_at": ANY,
         "completed_at": user_tasks[0].completed_at,
         "title": payload["title"],
@@ -97,7 +104,7 @@ def test_put_task_ok(api_client: APIClient, user_token: Token, user_tasks: list[
         "id": user_tasks[0].pk,
         "description": user_tasks[0].description,
         "status": user_tasks[0].status,
-        "due_date": user_tasks[0].due_date,
+        "duration_in_days": user_tasks[0].duration_in_days,
         "created_at": ANY,
         "completed_at": user_tasks[0].completed_at,
         "title": payload["title"],
@@ -124,13 +131,22 @@ def test_delete_task_ok(api_client: APIClient, user_token: Token, user_tasks: li
 
 
 @pytest.mark.django_db
-def test_comlited_task_ok(api_client: APIClient, user_token: Token, user_tasks: list[TaskOrm]) -> None:
-
+def test_comleted_task_ok(
+    mocker: MockerFixture, api_client: APIClient, user_token: Token, user_tasks: list[TaskOrm]
+) -> None:
+    mocker.patch.object(CompleteTaskService, "_send_message")
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + user_token.key)
     response = api_client.post(f"/todo/task/{user_tasks[0].pk}/complete/", format="json")
 
     task_1 = TaskOrm.objects.filter(pk=user_tasks[0].pk).first()
-
+    expected_data = {
+        "id": task_1.pk,
+        "status": task_1.status,
+        "created_at": ANY,
+        "completed_at": ANY,
+        "duration_in_days": task_1.duration_in_days,
+    }
     assert response.status_code == status.HTTP_200_OK
+    assert response.data == expected_data
     assert task_1.status == StatusEnum.COMPLETED
     assert task_1.completed_at is not None

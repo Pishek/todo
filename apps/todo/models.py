@@ -21,7 +21,7 @@ class TaskOrm(models.Model):
     description = models.TextField(blank=True, null=True)
     status = models.CharField(choices=[(x, x) for x in StatusEnum], default=StatusEnum.PENDING)
     priority = models.CharField(choices=[(x, x) for x in PriorityEnum], default=PriorityEnum.LOW)
-    due_date = models.DateTimeField(blank=True, null=True)
+    duration_in_days = models.IntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(blank=True, null=True)
