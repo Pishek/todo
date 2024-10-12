@@ -65,5 +65,13 @@ services:
       KAFKA_BROKERCONNECT: kafka:29092
     depends_on:
       - kafka
+
+  consumer:
+    build: .
+    depends_on:
+      - kafka
+    command: sh -c "export PYTHONPATH=. && sleep 10 && python apps/todo_monitor/main.py"
+    env_file:
+      - .envexample
 volumes:
   postgres_data:
