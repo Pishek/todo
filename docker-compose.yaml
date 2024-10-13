@@ -2,13 +2,13 @@ version: '3.9'
 
 services:
   app:
-    build:
-      dockerfile: Dockerfile_todo
+    build: .
     ports:
       - "8000:8000"
     depends_on:
       - db
       - kafka
+    command: sh -c "poetry run python manage.py migrate && poetry run python manage.py runserver 0.0.0.0:8000"
     env_file:
       - .envexample
     environment:
@@ -18,14 +18,24 @@ services:
       DB_HOST: "db"
       DB_PORT: "5432"
 
+  consumer:
+    build: .
+    depends_on:
+      - kafka
+    command: sh -c "cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head && sleep 10 && poetry run python main.py"
+    env_file:
+      - apps/todo_monitor/.envexample
+
   db:
     image: postgres:13
     ports:
       - "6432:5432"
     environment:
-      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: todo
+      DB_SECOND_NAME: alchemy_todo
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh  # скрипт для создания доп. БД
@@ -67,13 +77,5 @@ services:
     depends_on:
       - kafka
 
-  consumer:
-    build:
-      dockerfile: Dockerfile_todo_monitor
-    depends_on:
-      - kafka
-    command: sh -c "export PYTHONPATH=. && sleep 10 && poetry run python apps/todo_monitor/main.py"
-    env_file:
-      - .envexample
 volumes:
   postgres_data:

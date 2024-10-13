@@ -1,35 +1,38 @@
-from contextlib import contextmanager
-from typing import Generator
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from apps.todo_monitor.config import settings
-
-engine = create_engine(str(settings.DB.URL))
 
 
 class DataBase:
     def __init__(self) -> None:
-        self._session_factory = sessionmaker(engine)
+        self._engine = create_async_engine(str(settings.DB.URL))
+        self._session_factory = async_sessionmaker(bind=self._engine, expire_on_commit=False)
 
     @property
-    def session_factory(self) -> sessionmaker[Session]:
+    def engine(self) -> AsyncEngine:
+        return self._engine
+
+    @property
+    def session_factory(self) -> async_sessionmaker[AsyncSession]:
         return self._session_factory
 
-    @contextmanager
-    def session_scope(self) -> Generator[Session, None, None]:
+    @asynccontextmanager
+    async def session_scope(self) -> AsyncGenerator[AsyncSession, None]:
         """Provide a transactional scope around a series of operations."""
+
         session = self._session_factory()
 
         try:
             yield session
-            session.commit()
+            await session.commit()
         except Exception:
-            session.rollback()
+            await session.rollback()
             raise
         finally:
-            session.close()
+            await session.close()
 
 
 db = DataBase()

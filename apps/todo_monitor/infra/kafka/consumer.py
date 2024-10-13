@@ -2,56 +2,57 @@ import json
 import logging
 from typing import Any
 
-from confluent_kafka import Consumer, KafkaError, KafkaException, Message
+from aiokafka import AIOKafkaConsumer
+from aiokafka.structs import ConsumerRecord
 
 from apps.common.kafka.dto import CompletedTaskDTO
-from apps.todo_monitor.config import KAFKA_CONSUMER_CONFIG
+from apps.todo_monitor.config import settings
 from apps.todo_monitor.infra.kafka.enums import TopicKafkaEnum
 from apps.todo_monitor.services.counter_service import CounterCompletedTaskHandlerService
 
 logger = logging.getLogger(__name__)
 
+aiokafka_logger = logging.getLogger("aiokafka")
+aiokafka_logger.setLevel(logging.INFO)
+
 
 class KafkaConsumer:
     def __init__(self, topics: list[str]) -> None:
         self._topics = topics
-        self._consumer = Consumer(KAFKA_CONSUMER_CONFIG)
+        self._consumer = AIOKafkaConsumer(
+            *self._topics,
+            bootstrap_servers=f"{settings.KAFKA.HOST}:{settings.KAFKA.PORT}",
+            group_id=settings.KAFKA.GROUP_ID,
+        )
         self._counter_service = CounterCompletedTaskHandlerService()
 
-    def process_loop(self) -> None:
+    async def process_loop(self) -> None:
         try:
-            self._consumer.subscribe(self._topics)
-
-            while True:
-                msg = self._consumer.poll(timeout=1.0)
+            await self._consumer.start()
+            async for msg in self._consumer:
                 if msg is None:
                     continue
-                if msg.error():
-                    if msg.error().code() == KafkaError._PARTITION_EOF:
-                        # Информационное сообщение о конце партиции
-                        logger.debug(f"End of partition {msg.topic()} [{msg.partition()}] at offset {msg.offset()}")
-                    elif msg.error():
-                        raise KafkaException(msg.error())
-                topic = msg.topic()
-                self._consumer.commit(asynchronous=False)
+
+                topic = msg.topic
+                await self._consumer.commit()
                 msg = self._deserialize_message(msg)
 
                 if topic == TopicKafkaEnum.COMPLETED_TASKS:
                     msg_dto = self._build_completed_task_dto(msg)
-                    self._counter_service.process(msg_dto)
+                    await self._counter_service.process(msg_dto)
 
         finally:
-            self._consumer.close()
+            await self._consumer.stop()
 
     def _build_completed_task_dto(self, msg: dict[str, Any]) -> CompletedTaskDTO:
         return CompletedTaskDTO(**msg)
 
-    def _deserialize_message(self, msg: Message) -> dict[str, Any]:
+    def _deserialize_message(self, msg: ConsumerRecord) -> dict[str, Any]:
         logger.debug(
-            f"Received message from topic: {msg.topic()}, partition: {msg.partition()}, "
-            f"offset: {msg.offset()}, key: {msg.key()}, value: {msg.value().decode('utf-8')}"
+            f"Received message from topic: {msg.topic}, partition: {msg.partition}, "
+            f"offset: {msg.offset}, key: {msg.key}, value: {msg.value.decode('utf-8')}"
         )
-        return json.loads(msg.value().decode("utf-8"))
+        return json.loads(msg.value.decode("utf-8"))
 
 
 def get_completed_consumer() -> KafkaConsumer:
