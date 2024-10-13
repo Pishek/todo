@@ -1,5 +1,4 @@
 DB_NAME=todo
-DB_SECOND_NAME=alchemy_todo
 DB_USER=postgres
 DB_PASS=postgres
 DB_HOST=db

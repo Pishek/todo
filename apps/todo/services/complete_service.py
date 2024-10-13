@@ -1,7 +1,7 @@
 import math
 from datetime import datetime
 
-from apps.todo.infra.kafka.dto import CompletedTaskDTO
+from apps.common.kafka.dto import CompletedTaskDTO
 from apps.todo.infra.kafka.producer import get_kafka_producer
 from apps.todo.models import StatusEnum, TaskOrm
 

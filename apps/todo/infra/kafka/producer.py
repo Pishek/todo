@@ -6,16 +6,16 @@ from typing import Union
 from confluent_kafka import Producer
 from confluent_kafka.cimpl import KafkaException, Message
 
-from apps.todo.infra.kafka.dto import CompletedTaskDTO
-from apps.todo.infra.kafka.enums import TopicKafkaEnum
-from config.todo.settings import KAFKA_CONFIG
+from apps.common.kafka.dto import CompletedTaskDTO
+from apps.common.kafka.enums import TopicKafkaEnum
+from config.settings import KAFKA_PRODUCER_CONFIG
 
-logger = logging.getLogger("custom_logger")
+logger = logging.getLogger(__name__)
 
 
 class KafkaProducer:
     def __init__(self) -> None:
-        self._producer = Producer(KAFKA_CONFIG)
+        self._producer = Producer(KAFKA_PRODUCER_CONFIG)
 
     def send_completed_task(self, message: CompletedTaskDTO) -> None:
         self._send_message(topic=TopicKafkaEnum.COMPLETED_TASKS, message=self._serialize_message(asdict(message)))
