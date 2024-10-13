@@ -6,8 +6,8 @@ from aiokafka import AIOKafkaConsumer
 from aiokafka.structs import ConsumerRecord
 
 from apps.common.kafka.dto import CompletedTaskDTO
+from apps.common.kafka.enums import TopicKafkaEnum
 from apps.todo_monitor.config import settings
-from apps.todo_monitor.infra.kafka.enums import TopicKafkaEnum
 from apps.todo_monitor.services.counter_service import CounterCompletedTaskHandlerService
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,6 @@ class KafkaConsumer:
                     continue
 
                 topic = msg.topic
-                await self._consumer.commit()
                 msg = self._deserialize_message(msg)
 
                 if topic == TopicKafkaEnum.COMPLETED_TASKS:
