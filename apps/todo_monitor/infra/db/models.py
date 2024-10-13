@@ -10,8 +10,8 @@ class Base(DeclarativeBase):
     metadata = metadata
 
 
-class CompletedTaskOrm(Base):
-    __tablename__ = "completed_task"
+class UserTaskOrm(Base):
+    __tablename__ = "user_tasks"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4, server_default=text("gen_random_uuid()"))
     user_id: Mapped[int] = mapped_column(Integer, comment="id пользователя")

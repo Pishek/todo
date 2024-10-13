@@ -23,12 +23,13 @@ class KafkaConsumer:
             *self._topics,
             bootstrap_servers=f"{settings.KAFKA.HOST}:{settings.KAFKA.PORT}",
             group_id=settings.KAFKA.GROUP_ID,
+            auto_offset_reset="latest",
         )
         self._counter_service = CounterCompletedTaskHandlerService()
 
     async def process_loop(self) -> None:
+        await self._consumer.start()
         try:
-            await self._consumer.start()
             async for msg in self._consumer:
                 if msg is None:
                     continue
