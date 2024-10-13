@@ -8,7 +8,7 @@ from confluent_kafka.cimpl import KafkaException, Message
 
 from apps.common.kafka.dto import CompletedTaskDTO
 from apps.common.kafka.enums import TopicKafkaEnum
-from config.todo.settings import KAFKA_PRODUCER_CONFIG
+from config.settings import KAFKA_PRODUCER_CONFIG
 
 logger = logging.getLogger(__name__)
 

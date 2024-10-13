@@ -2,7 +2,8 @@ version: '3.9'
 
 services:
   app:
-    build: .
+    build:
+      dockerfile: Dockerfile_todo
     ports:
       - "8000:8000"
     depends_on:
@@ -67,10 +68,11 @@ services:
       - kafka
 
   consumer:
-    build: .
+    build:
+      dockerfile: Dockerfile_todo_monitor
     depends_on:
       - kafka
-    command: sh -c "export PYTHONPATH=. && sleep 10 && python apps/todo_monitor/main.py"
+    command: sh -c "export PYTHONPATH=. && sleep 10 && poetry run python apps/todo_monitor/main.py"
     env_file:
       - .envexample
 volumes:

@@ -1,6 +1,9 @@
 import os
 from logging.config import dictConfig
 
+from pydantic import PostgresDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -33,3 +36,17 @@ KAFKA_CONSUMER_CONFIG = {
 
 def setup_logging() -> None:
     dictConfig(LOGGING)
+
+
+class DatabaseSettings(BaseSettings):
+
+    model_config = SettingsConfigDict(env_prefix="DB_", env_file=".env", extra="ignore")
+
+    URL: PostgresDsn
+
+
+class Settings(BaseSettings):
+    DB: DatabaseSettings = DatabaseSettings()  # type:ignore[call-arg]
+
+
+settings = Settings()

@@ -5,9 +5,9 @@ from typing import Any
 from confluent_kafka import Consumer, KafkaError, KafkaException, Message
 
 from apps.common.kafka.dto import CompletedTaskDTO
+from apps.todo_monitor.config import KAFKA_CONSUMER_CONFIG
 from apps.todo_monitor.infra.kafka.enums import TopicKafkaEnum
 from apps.todo_monitor.services.counter_service import CounterCompletedTaskHandlerService
-from config.todo_monitor.settings import KAFKA_CONSUMER_CONFIG
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
+from apps.todo_monitor.config import setup_logging
 from apps.todo_monitor.infra.kafka.consumer import get_completed_consumer
-from config.todo_monitor.settings import setup_logging
 
 
 def run_comleted_tasks_consumer() -> None:
