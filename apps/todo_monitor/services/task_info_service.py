@@ -17,7 +17,7 @@ class TaskInfoHandlerService(AbstractHandlerServiceKafka):
 
     async def process(self, data: CompletedTaskDTO) -> None:
         task_info = await self._get_or_create(data)
-        await self._update_task_completed_ad(task_info, data)
+        await self._update_task(task_info, data)
 
     async def _get_or_create(self, data: CompletedTaskDTO) -> InfoTaskOrm:
         async with db.session_scope() as session:
@@ -26,10 +26,15 @@ class TaskInfoHandlerService(AbstractHandlerServiceKafka):
                 logger.debug(f"Created new task-info: user_id={result.user_id}, task_id={result.task_id}")
         return result
 
-    async def _update_task_completed_ad(self, task_info: InfoTaskOrm, data: CompletedTaskDTO) -> None:
+    async def _update_task(self, task_info: InfoTaskOrm, data: CompletedTaskDTO) -> None:
         completed_at_datetime = datetime.fromisoformat(data.completed_at).replace(tzinfo=None)
+        attempt_count = task_info.completion_attempts + 1
         async with db.session_scope() as session:
-            await self._repo(session).update(id_=task_info.id, completed_at=completed_at_datetime)
+            await self._repo(session).update(
+                id_=task_info.id,
+                completed_at=completed_at_datetime,
+                completion_attempts=attempt_count,
+            )
         logger.debug(f"user_id={task_info.user_id} updated task field completed_at={completed_at_datetime}")
 
 

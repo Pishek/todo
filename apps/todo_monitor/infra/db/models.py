@@ -29,3 +29,4 @@ class InfoTaskOrm(Base):
     title: Mapped[str] = mapped_column(TEXT, comment="Название задачи")
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, comment="время создания задачи")
     completed_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, comment="время закрытия задачи")
+    completion_attempts: Mapped[int] = mapped_column(Integer, default=0, comment="Попытка завершить задачу")
