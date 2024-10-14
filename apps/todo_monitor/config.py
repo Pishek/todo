@@ -13,8 +13,10 @@ class KafkaConsumerSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="KAFKA_", env_file=".env", extra="ignore")
 
-    HOST: str
-    PORT: str
+    HOST_1: str
+    HOST_2: str
+    PORT_1: str
+    PORT_2: str
     GROUP_ID: str
 
 

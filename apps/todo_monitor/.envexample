@@ -1,5 +1,8 @@
 DB_URL=postgresql+asyncpg://postgres:postgres@db:5432/alchemy_todo
 
 KAFKA_GROUP_ID=consumer_group_1
-KAFKA_HOST=kafka
-KAFKA_PORT=29092
+KAFKA_HOST_1=kafka1
+KAFKA_PORT_1=29092
+
+KAFKA_HOST_2=kafka2
+KAFKA_PORT_2=29093

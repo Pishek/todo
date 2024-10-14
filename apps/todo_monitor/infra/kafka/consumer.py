@@ -8,7 +8,7 @@ from aiokafka.structs import ConsumerRecord
 from apps.common.kafka.dto import CompletedTaskDTO
 from apps.common.kafka.enums import TopicKafkaEnum
 from apps.todo_monitor.config import settings
-from apps.todo_monitor.services.counter_service import CounterCompletedTaskHandlerService
+from apps.todo_monitor.services.service_abc import AbstractHandlerServiceKafka
 
 logger = logging.getLogger(__name__)
 
@@ -17,15 +17,20 @@ aiokafka_logger.setLevel(logging.INFO)
 
 
 class KafkaConsumer:
-    def __init__(self, topics: list[str]) -> None:
+    def __init__(self, name: str, group_id: str, topics: list[str], service: AbstractHandlerServiceKafka) -> None:
+        self._name = name
+        self._group_id = group_id
         self._topics = topics
         self._consumer = AIOKafkaConsumer(
             *self._topics,
-            bootstrap_servers=f"{settings.KAFKA.HOST}:{settings.KAFKA.PORT}",
-            group_id=settings.KAFKA.GROUP_ID,
+            bootstrap_servers=[
+                f"{settings.KAFKA.HOST_1}:{settings.KAFKA.PORT_1}",
+                f"{settings.KAFKA.HOST_2}:{settings.KAFKA.PORT_2}",
+            ],
+            group_id=self._group_id,
             auto_offset_reset="latest",
         )
-        self._counter_service = CounterCompletedTaskHandlerService()
+        self._service = service
 
     async def process_loop(self) -> None:
         await self._consumer.start()
@@ -34,12 +39,10 @@ class KafkaConsumer:
                 if msg is None:
                     continue
 
-                topic = msg.topic
-                msg = self._deserialize_message(msg)
-
-                if topic == TopicKafkaEnum.COMPLETED_TASKS:
+                if msg.topic == TopicKafkaEnum.COMPLETED_TASKS:
+                    msg = self._deserialize_message(msg)
                     msg_dto = self._build_completed_task_dto(msg)
-                    await self._counter_service.process(msg_dto)
+                    await self._service.process(msg_dto)
 
         finally:
             await self._consumer.stop()
@@ -49,11 +52,17 @@ class KafkaConsumer:
 
     def _deserialize_message(self, msg: ConsumerRecord) -> dict[str, Any]:
         logger.debug(
-            f"Received message from topic: {msg.topic}, partition: {msg.partition}, "
-            f"offset: {msg.offset}, key: {msg.key}, value: {msg.value.decode('utf-8')}"
+            f"Consumer: {self._name}, group_id: {self._group_id} received message from topic: "
+            f"{msg.topic}, partition: {msg.partition}, offset: {msg.offset}, "
+            f"key: {msg.key}, value: {msg.value.decode('utf-8')}"
         )
         return json.loads(msg.value.decode("utf-8"))
 
 
-def get_completed_consumer() -> KafkaConsumer:
-    return KafkaConsumer(topics=[TopicKafkaEnum.COMPLETED_TASKS])
+def get_completed_consumer(
+    name: str,
+    group_id: str,
+    topics: list[str],
+    service: AbstractHandlerServiceKafka,
+) -> KafkaConsumer:
+    return KafkaConsumer(name=name, group_id=group_id, topics=topics, service=service)
