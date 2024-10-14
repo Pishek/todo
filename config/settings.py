@@ -174,5 +174,10 @@ LOGGING = {
     },
 }
 
+KAFKA_HOST_1 = os.getenv("KAFKA_HOST_1", None)
+KAFKA_PORT_1 = os.getenv("KAFKA_PORT_1", None)
 
-KAFKA_PRODUCER_CONFIG = {"bootstrap.servers": f"{os.getenv('KAFKA_HOST')}:{os.getenv('KAFKA_PORT')}"}
+KAFKA_HOST_2 = os.getenv("KAFKA_HOST_2", None)
+KAFKA_PORT_2 = os.getenv("KAFKA_PORT_2", None)
+
+KAFKA_PRODUCER_CONFIG = {"bootstrap.servers": f"{KAFKA_HOST_1}:{KAFKA_PORT_1}," f"{KAFKA_HOST_2}:{KAFKA_PORT_2}"}

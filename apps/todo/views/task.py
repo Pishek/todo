@@ -76,7 +76,9 @@ class TaskCompleteViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
     def get_object(self) -> TaskOrm:
         try:
-            return super().get_object()
+            if (task := super().get_object()) and task.user == self.request.user:
+                return task
+            raise UserTasksNotFoundException
         except Http404:
             raise UserTasksNotFoundException
 
