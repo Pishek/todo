@@ -12,12 +12,6 @@ services:
     command: sh -c "poetry run python manage.py migrate && poetry run python manage.py runserver 0.0.0.0:8000"
     env_file:
       - .envexample
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      DB_HOST: "db"
-      DB_PORT: "5432"
 
   consumer_group_1_first:
     build: .
@@ -25,7 +19,9 @@ services:
     depends_on:
       - kafka1
       - kafka2
-    command: sh -c "cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head && sleep 10 && poetry run python main.py run-comleted-tasks-consumer consumer_1 group_1"
+    command: >
+      sh -c "cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head && sleep 10 
+      && poetry run python main.py run-comleted-tasks-consumer consumer_1 group_1"
     env_file:
       - apps/todo_monitor/.envexample
 
@@ -35,7 +31,9 @@ services:
     depends_on:
       - kafka1
       - kafka2
-    command: sh -c "cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head && sleep 10 && poetry run python main.py run-comleted-tasks-consumer consumer_2 group_1"
+    command: >
+      sh -c "sleep 10 && cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head 
+      && poetry run python main.py run-comleted-tasks-consumer consumer_2 group_1"
     env_file:
       - apps/todo_monitor/.envexample
 
@@ -46,7 +44,9 @@ services:
     depends_on:
       - kafka1
       - kafka2
-    command: sh -c "cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head && sleep 10 && poetry run python main.py run-info-tasks-consumer consumer group_2"
+    command: >
+      sh -c "sleep 10 && cd apps/todo_monitor/ && export PYTHONPATH=../../. && alembic upgrade head  
+      && poetry run python main.py run-info-tasks-consumer consumer group_2"
     env_file:
       - apps/todo_monitor/.envexample
 
